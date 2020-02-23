@@ -55,7 +55,7 @@ let app = SuperchargeFactory.build({
 
 ### Credits
 
-This framework was heavily inspired by [Igniter](https://github.com/nicoth-in/igniter]) from [Nicothin](https://github.com/nicoth-in).
+This framework was heavily inspired by [Igniter](https://github.com/nicoth-in/igniter) from [Nicothin](https://github.com/nicoth-in).
 
 ### License
 
