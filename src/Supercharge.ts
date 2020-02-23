@@ -6,7 +6,6 @@
  */
 class Supercharge {
     public element;
-    public children;
 
     constructor(tag: string, body: any = undefined) {
         // create element
