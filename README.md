@@ -76,6 +76,26 @@ class Clock extends SuperchargeBindable
 }
 ```
 
+
+```js
+class Button extends SuperchargeBindable
+{
+    public value = 0;
+
+    constructor() {
+        super('button', 'My current value is "{value}"');
+
+        this.bind('value');
+        this.setBinding('value', this.value);
+    }
+
+    public onClick(e)
+    {
+        this.setBinding('value', ++this.value);
+    }
+}
+```
+
 ### Credits
 
 This framework was heavily inspired by [Igniter](https://github.com/nicoth-in/igniter) from [Nicothin](https://github.com/nicoth-in).
