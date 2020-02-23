@@ -95,7 +95,16 @@ var SuperchargeFactory = (function () {
         }
         else {
             if (typeof input.body == "string") {
-                node = new Supercharge(input.tag, input.body);
+                if (typeof input.bindings != "undefined") {
+                    node = new SuperchargeBindable(input.tag, input.body);
+                    for (var binding in input.bindings) {
+                        if (input.bindings.hasOwnProperty(binding)) {
+                            node.bind(binding, input.bindings[binding]);
+                        }
+                    }
+                }
+                else
+                    node = new Supercharge(input.tag, input.body);
                 if (typeof input.onClick == "function")
                     node.onClick = input.onClick.bind(node);
             }

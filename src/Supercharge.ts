@@ -5,7 +5,6 @@
  * work on Supercharge instances
  */
 class Supercharge {
-
     public element;
 
     constructor(tag: string, body: any = undefined) {
@@ -28,7 +27,6 @@ class Supercharge {
                 this.element.appendChild(body);
         }
 
-        // assign events
         this.element.onclick = (e) => this.onClick(e);
         this.element.onload = () => this.onLoad();
 
@@ -125,12 +123,27 @@ class SuperchargeFactory
             // TODO: finish build process
             if (typeof input.body == "string")
             {
-                node = new Supercharge(input.tag, input.body);
+                if (typeof input.bindings != "undefined")
+                {
+                    node = new SuperchargeBindable(input.tag, input.body);
+
+                    for (let binding in input.bindings)
+                    {
+                        if (input.bindings.hasOwnProperty(binding))
+                        {
+                            node.bind(binding, input.bindings[binding]);
+                        }
+                    }
+                }
+                else
+                    node = new Supercharge(input.tag, input.body);
+
                 if (typeof input.onClick == "function") node.onClick = input.onClick.bind(node);
             }
             else if (typeof input.body == "object")
             {
                 node = new Supercharge(input.tag);
+
                 for (let inputNode in input.body) {
                     if (input.body.hasOwnProperty(inputNode))
                     {
