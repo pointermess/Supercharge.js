@@ -42,7 +42,6 @@ document.body.appendChild(app.element);
 
 ### Events
 
-#### Factory
 ```js
 let app = SuperchargeFactory.build({
     ...
@@ -51,6 +50,30 @@ let app = SuperchargeFactory.build({
     }
     ...
 });
+```
+
+### Bindings
+
+Supercharge.js supports very simple bindings. They only work on elements where the body consists of only a string and no other elements.
+
+```js
+class Clock extends SuperchargeBindable
+{
+    constructor() {
+        super('div', 'The current time is {time} and the date is {date}.');
+
+        // binds the variables
+        this.bind('time');
+        this.bind('date');
+        
+        // set the time and date every second
+        setInterval(() => {
+            var date = new Date();
+            this.setBinding('time', date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds());
+            this.setBinding('date', date.getDate() + '. ' + date.getMonth() + '. ' + date.getFullYear());
+        }, 1000);
+    }
+}
 ```
 
 ### Credits
