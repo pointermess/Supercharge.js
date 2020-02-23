@@ -102,6 +102,21 @@ class Button extends SuperchargeBindable
 }
 ```
 
+### Factory
+
+```js
+let factory = SuperchargeFactory.build({
+    'tag': 'div',
+    'body': 'Hello World from {name}!',
+    'bindings':{
+        'name': '[click to reveal]'
+    },
+    'onClick': function () {
+        this.setBinding('name', 'Supercharge.js');
+    }
+});
+```
+
 ### Credits
 
 This framework was heavily inspired by [Igniter](https://github.com/nicoth-in/igniter) from [Nicothin](https://github.com/nicoth-in).
