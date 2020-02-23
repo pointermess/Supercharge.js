@@ -5,11 +5,11 @@
  * work on Supercharge instances
  */
 class Supercharge {
+
     public element;
 
     constructor(tag: string, body: any = undefined) {
         // create element
-
         let node;
 
         // append body
@@ -30,13 +30,76 @@ class Supercharge {
 
         // assign events
         this.element.onclick = (e) => this.onClick(e);
+        this.element.onload = () => this.onLoad();
+
+        this.onMount();
     }
 
+    public mount(element) {
+        element.appendChild(this.element);
+    }
+
+    public unmount() {
+        this.element.parentNode.removeChild(this.element);
+    }
 
     /*
      * Events
      */
     public onClick(e) {};
+    public onLoad() {};
+    public onMount() {};
+}
+
+class SuperchargeBindable extends Supercharge
+{
+    protected binding = false;
+    private innerHtml = '';
+    public bindings = {};
+
+    constructor(tag: string, body: string) {
+        super(tag, body);
+
+        if (typeof body != "string")
+        {
+            console.error('Bindable supercharge class can only have a string body.');
+            return;
+        }
+
+        this.innerHtml = this.element.innerHTML;
+    }
+
+    public bind(key, defaultValue = '')
+    {
+        this.bindings[key] = {
+            'val': defaultValue
+        };
+        this.refreshBindings();
+    }
+
+    public refreshBindings() {
+        let def = this.innerHtml;
+        for (let binding in this.bindings)
+        {
+            console.log(this.bindings[binding].val);
+            def = def.replace('{' + binding + '}', this.bindings[binding].val);
+        }
+        this.element.innerHTML = def;
+    }
+
+    public startBinding() { this.binding = true; }
+    public stopBinding() { this.binding = false; this.refreshBindings(); }
+
+    public setBinding(key, value)
+    {
+        if (typeof this.bindings[key] == "object")
+        {
+            this.bindings[key].val = value;
+
+            if (!this.binding)
+                this.refreshBindings();
+        }
+    }
 }
 
 /**
@@ -63,7 +126,7 @@ class SuperchargeFactory
             if (typeof input.body == "string")
             {
                 node = new Supercharge(input.tag, input.body);
-                node.onClick = input.onClick.bind(node);
+                if (typeof input.onClick == "function") node.onClick = input.onClick.bind(node);
             }
             else if (typeof input.body == "object")
             {
