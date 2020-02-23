@@ -36,8 +36,14 @@ let app = SuperchargeFactory.build({
 
 ### Mounting our application
 
+Before our application appear on the site, we have to mount it first. Supercharge.js provides ways to mount and unmount our application.
+
 ```js
-document.body.appendChild(app.element);
+// mounting the application
+app.mount(document.body);
+
+// unmounting the application
+app.unmount();
 ```
 
 ### Events
