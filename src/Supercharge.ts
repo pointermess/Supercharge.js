@@ -14,6 +14,7 @@ class Supercharge {
         // append body
         this.element = document.createElement(tag);
 
+
         if (typeof body == "string")
         {
             node = document.createTextNode(body);
@@ -23,18 +24,30 @@ class Supercharge {
         {
             if (body instanceof Supercharge)
                 this.element.appendChild(body.element);
-            else
+            else if (body instanceof Node)
                 this.element.appendChild(body);
+            else
+            {
+                for (let bodyIndex in body)
+                {
+                    if (body.hasOwnProperty(bodyIndex))
+                        body[bodyIndex].mount(this.element);
+                }
+            }
         }
 
         this.element.onclick = (e) => this.onClick(e);
         this.element.onload = () => this.onLoad();
 
-        this.onMount();
+        this.onCreate();
     }
 
     public mount(element) {
-        element.appendChild(this.element);
+        this.onMount();
+        if (element instanceof Node)
+            element.appendChild(this.element);
+        else if (element instanceof Supercharge)
+            element.element.appendChild(this.element);
     }
 
     public unmount() {
@@ -47,6 +60,7 @@ class Supercharge {
     public onClick(e) {};
     public onLoad() {};
     public onMount() {};
+    public onCreate() {};
 }
 
 class SuperchargeBindable extends Supercharge
@@ -65,6 +79,7 @@ class SuperchargeBindable extends Supercharge
         }
 
         this.innerHtml = this.element.innerHTML;
+        this.onCreate();
     }
 
     public bind(key, defaultValue = '')
@@ -139,6 +154,8 @@ class SuperchargeFactory
                     node = new Supercharge(input.tag, input.body);
 
                 if (typeof input.onClick == "function") node.onClick = input.onClick.bind(node);
+                if (typeof input.onMount == "function") node.onMount = input.onMount.bind(node);
+                if (typeof input.onCreate == "function") node.onMount = input.onCreate.bind(node);
             }
             else if (typeof input.body == "object")
             {
@@ -155,5 +172,17 @@ class SuperchargeFactory
         }
 
         return node;
+    }
+
+    public static buildArray(input) : any
+    {
+        let result = [];
+
+
+        for (let inputNode in input) {
+            result.push(this.build(input[inputNode]));
+        }
+
+        return result;
     }
 }

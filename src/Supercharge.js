@@ -24,15 +24,25 @@ var Supercharge = (function () {
         else if (typeof body == "object") {
             if (body instanceof Supercharge)
                 this.element.appendChild(body.element);
-            else
+            else if (body instanceof Node)
                 this.element.appendChild(body);
+            else {
+                for (var bodyIndex in body) {
+                    if (body.hasOwnProperty(bodyIndex))
+                        body[bodyIndex].mount(this.element);
+                }
+            }
         }
         this.element.onclick = function (e) { return _this.onClick(e); };
         this.element.onload = function () { return _this.onLoad(); };
-        this.onMount();
+        this.onCreate();
     }
     Supercharge.prototype.mount = function (element) {
-        element.appendChild(this.element);
+        this.onMount();
+        if (element instanceof Node)
+            element.appendChild(this.element);
+        else if (element instanceof Supercharge)
+            element.element.appendChild(this.element);
     };
     Supercharge.prototype.unmount = function () {
         this.element.parentNode.removeChild(this.element);
@@ -42,6 +52,8 @@ var Supercharge = (function () {
     Supercharge.prototype.onLoad = function () { };
     ;
     Supercharge.prototype.onMount = function () { };
+    ;
+    Supercharge.prototype.onCreate = function () { };
     ;
     return Supercharge;
 }());
@@ -57,6 +69,7 @@ var SuperchargeBindable = (function (_super) {
             return _this;
         }
         _this.innerHtml = _this.element.innerHTML;
+        _this.onCreate();
         return _this;
     }
     SuperchargeBindable.prototype.bind = function (key, defaultValue) {
@@ -107,6 +120,10 @@ var SuperchargeFactory = (function () {
                     node = new Supercharge(input.tag, input.body);
                 if (typeof input.onClick == "function")
                     node.onClick = input.onClick.bind(node);
+                if (typeof input.onMount == "function")
+                    node.onMount = input.onMount.bind(node);
+                if (typeof input.onCreate == "function")
+                    node.onMount = input.onCreate.bind(node);
             }
             else if (typeof input.body == "object") {
                 node = new Supercharge(input.tag);
@@ -119,6 +136,13 @@ var SuperchargeFactory = (function () {
             }
         }
         return node;
+    };
+    SuperchargeFactory.buildArray = function (input) {
+        var result = [];
+        for (var inputNode in input) {
+            result.push(this.build(input[inputNode]));
+        }
+        return result;
     };
     return SuperchargeFactory;
 }());
