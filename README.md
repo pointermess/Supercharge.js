@@ -64,7 +64,7 @@ let app = SuperchargeFactory.build({
 
 ### Bindings
 
-Supercharge.js supports very simple bindings. They only work on elements where the body consists of only a string and no other elements.
+Supercharge.js supports very simple bindings but it is recommended to only use it in components containing non-bindable elements only.
 
 ```js
 class Clock extends SuperchargeBindable
