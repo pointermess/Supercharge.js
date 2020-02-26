@@ -53,6 +53,14 @@ app.unmount();
 ### Events
 
 ```js
+class Button extends Supercharge {
+    onClick(e) {
+        alert('Button clicked!');
+    }
+}
+```
+
+```js
 let app = SuperchargeFactory.build({
     ...
     'onClick': function (e) {
