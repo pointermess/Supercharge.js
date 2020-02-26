@@ -64,10 +64,6 @@ var SuperchargeBindable = (function (_super) {
         _this.binding = false;
         _this.innerHtml = '';
         _this.bindings = {};
-        if (typeof body != "string") {
-            console.error('Bindable supercharge class can only have a string body.');
-            return _this;
-        }
         _this.innerHtml = _this.element.innerHTML;
         _this.onCreate();
         return _this;

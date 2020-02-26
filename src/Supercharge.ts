@@ -72,12 +72,6 @@ class SuperchargeBindable extends Supercharge
     constructor(tag: string, body: string) {
         super(tag, body);
 
-        if (typeof body != "string")
-        {
-            console.error('Bindable supercharge class can only have a string body.');
-            return;
-        }
-
         this.innerHtml = this.element.innerHTML;
         this.onCreate();
     }
