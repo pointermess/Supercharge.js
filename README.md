@@ -52,6 +52,8 @@ app.unmount();
 
 ### Events
 
+#### Using Supercharge class
+
 ```js
 class Button extends Supercharge {
     onClick(e) {
@@ -59,6 +61,8 @@ class Button extends Supercharge {
     }
 }
 ```
+
+#### Using factory
 
 ```js
 let app = SuperchargeFactory.build({
@@ -96,7 +100,7 @@ class Clock extends SuperchargeBindable
 
 
 ```js
-class Button extends SuperchargeBindable
+class CounterButton extends SuperchargeBindable
 {
     public value = 0;
 
