@@ -74,66 +74,6 @@ let app = SuperchargeFactory.build({
 });
 ```
 
-### Bindings
-
-Supercharge.js supports very simple bindings but it is recommended to only use it in components containing non-bindable elements only.
-
-```js
-class Clock extends SuperchargeBindable
-{
-    constructor() {
-        super('div', 'The current time is {time} and the date is {date}.');
-
-        // binds the variables
-        this.bind('time');
-        this.bind('date');
-        
-        // set the time and date every second
-        setInterval(() => {
-            var date = new Date();
-            this.setBinding('time', date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds());
-            this.setBinding('date', date.getDate() + '. ' + date.getMonth() + '. ' + date.getFullYear());
-        }, 1000);
-    }
-}
-```
-
-
-```js
-class CounterButton extends SuperchargeBindable
-{
-    public value = 0;
-
-    constructor() {
-        super('button', 'My current value is "{value}"');
-
-        this.bind('value');
-        this.setBinding('value', this.value);
-    }
-
-    public onClick(e)
-    {
-        this.setBinding('value', ++this.value);
-    }
-}
-```
-
-### Factory
-
-
-```js
-let factory = SuperchargeFactory.build({
-    'tag': 'div',
-    'body': 'Hello World from {name}!',
-    'bindings':{
-        'name': '[click to reveal]'
-    },
-    'onClick': function () {
-        this.setBinding('name', 'Supercharge.js');
-    }
-});
-```
-
 #### Functions
 
 It is possible to assign functions to factory built objects.
