@@ -1,16 +1,3 @@
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var Supercharge = (function () {
     function Supercharge(tag, body) {
         var _this = this;
@@ -37,6 +24,19 @@ var Supercharge = (function () {
         this.element.onload = function () { return _this.onLoad(); };
         this.onCreate();
     }
+    Supercharge.prototype.setId = function (id) {
+        this.element.id = id;
+    };
+    Supercharge.prototype.setAttribute = function (attr, value) {
+    };
+    Supercharge.prototype.addClass = function (attr, value) {
+    };
+    Supercharge.prototype.removeClass = function (attr, value) {
+    };
+    Supercharge.prototype.hasClass = function (attr, value) {
+    };
+    Supercharge.prototype.toggleClass = function (attr, value) {
+    };
     Supercharge.prototype.mount = function (element) {
         this.onMount();
         if (element instanceof Node)
@@ -46,6 +46,14 @@ var Supercharge = (function () {
     };
     Supercharge.prototype.unmount = function () {
         this.element.parentNode.removeChild(this.element);
+    };
+    Supercharge.prototype.insert = function (array) {
+        for (var item in array) {
+            if (array.hasOwnProperty(item)) {
+                array[item].mount(this);
+                console.log(array[item]);
+            }
+        }
     };
     Supercharge.prototype.onClick = function (e) { };
     ;
@@ -57,43 +65,6 @@ var Supercharge = (function () {
     ;
     return Supercharge;
 }());
-var SuperchargeBindable = (function (_super) {
-    __extends(SuperchargeBindable, _super);
-    function SuperchargeBindable(tag, body) {
-        var _this = _super.call(this, tag, body) || this;
-        _this.binding = false;
-        _this.innerHtml = '';
-        _this.bindings = {};
-        _this.innerHtml = _this.element.innerHTML;
-        _this.onCreate();
-        return _this;
-    }
-    SuperchargeBindable.prototype.bind = function (key, defaultValue) {
-        if (defaultValue === void 0) { defaultValue = ''; }
-        this.bindings[key] = {
-            'val': defaultValue
-        };
-        this.refreshBindings();
-    };
-    SuperchargeBindable.prototype.refreshBindings = function () {
-        var def = this.innerHtml;
-        for (var binding in this.bindings) {
-            var value = this.bindings[binding].val;
-            def = def.replace('{' + binding + '}', value);
-        }
-        this.element.innerHTML = def;
-    };
-    SuperchargeBindable.prototype.startBinding = function () { this.binding = true; };
-    SuperchargeBindable.prototype.stopBinding = function () { this.binding = false; this.refreshBindings(); };
-    SuperchargeBindable.prototype.setBinding = function (key, value) {
-        if (typeof this.bindings[key] == "object") {
-            this.bindings[key].val = value;
-            if (!this.binding)
-                this.refreshBindings();
-        }
-    };
-    return SuperchargeBindable;
-}(Supercharge));
 var SuperchargeFactory = (function () {
     function SuperchargeFactory() {
     }
@@ -104,20 +75,11 @@ var SuperchargeFactory = (function () {
             return input;
         }
         else {
+            node = new Supercharge(input.tag);
             if (typeof input.body == "string") {
-                if (typeof input.bindings != "undefined") {
-                    node = new SuperchargeBindable(input.tag, input.body);
-                    for (var binding in input.bindings) {
-                        if (input.bindings.hasOwnProperty(binding)) {
-                            node.bind(binding, input.bindings[binding]);
-                        }
-                    }
-                }
-                else
-                    node = new Supercharge(input.tag, input.body);
+                node.element.appendChild(document.createTextNode(input.body));
             }
             else if (typeof input.body == "object") {
-                node = new Supercharge(input.tag);
                 for (var inputNode in input.body) {
                     if (input.body.hasOwnProperty(inputNode)) {
                         var childNode = this.build(input.body[inputNode], node);

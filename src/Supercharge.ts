@@ -42,6 +42,30 @@ class Supercharge {
         this.onCreate();
     }
 
+    public setId(id) {
+        this.element.id = id;
+    }
+
+    public setAttribute(attr, value) {
+
+    }
+
+    public addClass(attr, value) {
+
+    }
+
+    public removeClass(attr, value) {
+
+    }
+
+    public hasClass(attr, value) {
+
+    }
+
+    public toggleClass(attr, value) {
+
+    }
+
     public mount(element) {
         this.onMount();
         if (element instanceof Node)
@@ -54,6 +78,18 @@ class Supercharge {
         this.element.parentNode.removeChild(this.element);
     }
 
+    public insert(array)
+    {
+        for (let item in array)
+        {
+            if (array.hasOwnProperty(item))
+            {
+                array[item].mount(this);
+                console.log(array[item]);
+            }
+        }
+    }
+
 
     /*
      * Events
@@ -64,59 +100,6 @@ class Supercharge {
     public onCreate() {};
 }
 
-/**
- * SuperchargeBindable class
- *
- * Supercharge with bindable components. Use it with caution as it can cause issues when
- * having dynamic elements as children.
- */
-class SuperchargeBindable extends Supercharge
-{
-    protected binding = false;
-    private innerHtml = '';
-    public bindings = {};
-
-    constructor(tag: string, body: string) {
-        super(tag, body);
-
-        this.innerHtml = this.element.innerHTML;
-        this.onCreate();
-    }
-
-    public bind(key, defaultValue = '')
-    {
-        this.bindings[key] = {
-            'val': defaultValue
-        };
-        this.refreshBindings();
-    }
-
-    public refreshBindings() {
-        let def = this.innerHtml;
-        for (let binding in this.bindings)
-        {
-            let value : any = this.bindings[binding].val;
-
-
-            def = def.replace('{' + binding + '}', value );
-        }
-        this.element.innerHTML = def;
-    }
-
-    public startBinding() { this.binding = true; }
-    public stopBinding() { this.binding = false; this.refreshBindings(); }
-
-    public setBinding(key, value)
-    {
-        if (typeof this.bindings[key] == "object")
-        {
-            this.bindings[key].val = value;
-
-            if (!this.binding)
-                this.refreshBindings();
-        }
-    }
-}
 
 /**
  * factory class to build trees of Supercharge objects
@@ -139,28 +122,15 @@ class SuperchargeFactory
         }
         else
         {
+            node = new Supercharge(input.tag);
+
             // TODO: finish build process
             if (typeof input.body == "string")
             {
-                if (typeof input.bindings != "undefined")
-                {
-                    node = new SuperchargeBindable(input.tag, input.body);
-
-                    for (let binding in input.bindings)
-                    {
-                        if (input.bindings.hasOwnProperty(binding))
-                        {
-                            node.bind(binding, input.bindings[binding]);
-                        }
-                    }
-                }
-                else
-                    node = new Supercharge(input.tag, input.body);
+                node.element.appendChild(document.createTextNode(input.body));
             }
             else if (typeof input.body == "object")
             {
-                node = new Supercharge(input.tag);
-
                 for (let inputNode in input.body) {
                     if (input.body.hasOwnProperty(inputNode))
                     {
@@ -187,7 +157,6 @@ class SuperchargeFactory
                 console.log('added to root: ' + inputFunction);
             }
         }
-
 
         return node;
     }
