@@ -120,6 +120,7 @@ class CounterButton extends SuperchargeBindable
 
 ### Factory
 
+
 ```js
 let factory = SuperchargeFactory.build({
     'tag': 'div',
@@ -129,6 +130,34 @@ let factory = SuperchargeFactory.build({
     },
     'onClick': function () {
         this.setBinding('name', 'Supercharge.js');
+    }
+});
+```
+
+#### Functions
+
+It is possible to assign functions to factory built objects.
+
+```js
+let factory = SuperchargeFactory.build({
+    'tag': 'div',
+    'body': [
+        {
+            'tag': 'div',
+            'body': 'Hello world from Supercharge.js Factory'
+        },
+        {
+            'tag': 'button',
+            'body': 'Click me',
+            'onClick': function () {
+                this.SayHi('button');
+            }
+        },
+    ],
+    'functions': {
+        SayHi: function(sender) {
+            alert(`Hi from "${sender}"!`);
+        }
     }
 });
 ```
