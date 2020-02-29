@@ -78,8 +78,8 @@ var SuperchargeBindable = (function (_super) {
     SuperchargeBindable.prototype.refreshBindings = function () {
         var def = this.innerHtml;
         for (var binding in this.bindings) {
-            console.log(this.bindings[binding].val);
-            def = def.replace('{' + binding + '}', this.bindings[binding].val);
+            var value = this.bindings[binding].val;
+            def = def.replace('{' + binding + '}', value);
         }
         this.element.innerHTML = def;
     };
@@ -97,7 +97,8 @@ var SuperchargeBindable = (function (_super) {
 var SuperchargeFactory = (function () {
     function SuperchargeFactory() {
     }
-    SuperchargeFactory.build = function (input) {
+    SuperchargeFactory.build = function (input, parent) {
+        if (parent === void 0) { parent = undefined; }
         var node;
         if (input instanceof Supercharge) {
             return input;
@@ -114,21 +115,30 @@ var SuperchargeFactory = (function () {
                 }
                 else
                     node = new Supercharge(input.tag, input.body);
-                if (typeof input.onClick == "function")
-                    node.onClick = input.onClick.bind(node);
-                if (typeof input.onMount == "function")
-                    node.onMount = input.onMount.bind(node);
-                if (typeof input.onCreate == "function")
-                    node.onMount = input.onCreate.bind(node);
             }
             else if (typeof input.body == "object") {
                 node = new Supercharge(input.tag);
                 for (var inputNode in input.body) {
                     if (input.body.hasOwnProperty(inputNode)) {
-                        var childNode = this.build(input.body[inputNode]);
+                        var childNode = this.build(input.body[inputNode], node);
                         node.element.appendChild(childNode.element);
                     }
                 }
+            }
+        }
+        var parentNode = node;
+        if (parent != undefined)
+            parentNode = parent;
+        if (typeof input.onClick == "function")
+            node.onClick = input.onClick.bind(parentNode);
+        if (typeof input.onMount == "function")
+            node.onMount = input.onMount.bind(parentNode);
+        if (typeof input.onCreate == "function")
+            node.onMount = input.onCreate.bind(node);
+        for (var inputFunction in input.functions) {
+            if (input.functions.hasOwnProperty(inputFunction)) {
+                parentNode[inputFunction] = input.functions[inputFunction];
+                console.log('added to root: ' + inputFunction);
             }
         }
         return node;

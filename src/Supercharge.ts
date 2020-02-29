@@ -54,6 +54,7 @@ class Supercharge {
         this.element.parentNode.removeChild(this.element);
     }
 
+
     /*
      * Events
      */
@@ -63,6 +64,12 @@ class Supercharge {
     public onCreate() {};
 }
 
+/**
+ * SuperchargeBindable class
+ *
+ * Supercharge with bindable components. Use it with caution as it can cause issues when
+ * having dynamic elements as children.
+ */
 class SuperchargeBindable extends Supercharge
 {
     protected binding = false;
@@ -88,8 +95,10 @@ class SuperchargeBindable extends Supercharge
         let def = this.innerHtml;
         for (let binding in this.bindings)
         {
-            console.log(this.bindings[binding].val);
-            def = def.replace('{' + binding + '}', this.bindings[binding].val);
+            let value : any = this.bindings[binding].val;
+
+
+            def = def.replace('{' + binding + '}', value );
         }
         this.element.innerHTML = def;
     }
@@ -119,9 +128,10 @@ class SuperchargeFactory
      * @param input object
      * @return Built instance of a Supercharge object
      */
-    public static build(input)
+    public static build(input, parent = undefined)
     {
         let node;
+
 
         if (input instanceof Supercharge)
         {
@@ -146,10 +156,6 @@ class SuperchargeFactory
                 }
                 else
                     node = new Supercharge(input.tag, input.body);
-
-                if (typeof input.onClick == "function") node.onClick = input.onClick.bind(node);
-                if (typeof input.onMount == "function") node.onMount = input.onMount.bind(node);
-                if (typeof input.onCreate == "function") node.onMount = input.onCreate.bind(node);
             }
             else if (typeof input.body == "object")
             {
@@ -158,15 +164,34 @@ class SuperchargeFactory
                 for (let inputNode in input.body) {
                     if (input.body.hasOwnProperty(inputNode))
                     {
-                        let childNode = this.build(input.body[inputNode]);
+                        let childNode = this.build(input.body[inputNode], node);
                         node.element.appendChild(childNode.element);
                     }
                 }
             }
         }
 
+        // experimental feature
+        let parentNode = node;
+        if (parent != undefined) parentNode = parent;
+
+        if (typeof input.onClick == "function") node.onClick = input.onClick.bind(parentNode);
+        if (typeof input.onMount == "function") node.onMount = input.onMount.bind(parentNode);
+        if (typeof input.onCreate == "function") node.onMount = input.onCreate.bind(node);
+
+        // functions
+        for (let inputFunction in input.functions) {
+            if (input.functions.hasOwnProperty(inputFunction))
+            {
+                parentNode[inputFunction] = input.functions[inputFunction];
+                console.log('added to root: ' + inputFunction);
+            }
+        }
+
+
         return node;
     }
+
 
     public static buildArray(input) : any
     {
