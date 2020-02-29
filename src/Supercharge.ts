@@ -42,6 +42,30 @@ class Supercharge {
         this.onCreate();
     }
 
+    public setId(id) {
+        this.element.id = id;
+    }
+
+    public setAttribute(attr, value) {
+
+    }
+
+    public addClass(attr, value) {
+
+    }
+
+    public removeClass(attr, value) {
+
+    }
+
+    public hasClass(attr, value) {
+
+    }
+
+    public toggleClass(attr, value) {
+
+    }
+
     public mount(element) {
         this.onMount();
         if (element instanceof Node)
@@ -52,6 +76,18 @@ class Supercharge {
 
     public unmount() {
         this.element.parentNode.removeChild(this.element);
+    }
+
+    public insert(array)
+    {
+        for (let item in array)
+        {
+            if (array.hasOwnProperty(item))
+            {
+                array[item].mount(this);
+                console.log(array[item]);
+            }
+        }
     }
 
 
@@ -76,11 +112,16 @@ class SuperchargeBindable extends Supercharge
     private innerHtml = '';
     public bindings = {};
 
-    constructor(tag: string, body: string) {
+    constructor(tag: string, body: string = '') {
         super(tag, body);
 
-        this.innerHtml = this.element.innerHTML;
+        this.initDataBinding();
         this.onCreate();
+    }
+
+    public initDataBinding() {
+        this.innerHtml = this.element.innerHTML;
+        console.log(this.innerHtml);
     }
 
     public bind(key, defaultValue = '')
@@ -97,6 +138,10 @@ class SuperchargeBindable extends Supercharge
         {
             let value : any = this.bindings[binding].val;
 
+            if (typeof value == "function")
+            {
+                value = this.bindings[binding].val();
+            }
 
             def = def.replace('{' + binding + '}', value );
         }
@@ -139,28 +184,18 @@ class SuperchargeFactory
         }
         else
         {
+            if (typeof input.bindings != "undefined")
+                node = new SuperchargeBindable(input.tag);
+            else
+                node = new Supercharge(input.tag);
+
             // TODO: finish build process
             if (typeof input.body == "string")
             {
-                if (typeof input.bindings != "undefined")
-                {
-                    node = new SuperchargeBindable(input.tag, input.body);
-
-                    for (let binding in input.bindings)
-                    {
-                        if (input.bindings.hasOwnProperty(binding))
-                        {
-                            node.bind(binding, input.bindings[binding]);
-                        }
-                    }
-                }
-                else
-                    node = new Supercharge(input.tag, input.body);
+                node.element.appendChild(document.createTextNode(input.body));
             }
             else if (typeof input.body == "object")
             {
-                node = new Supercharge(input.tag);
-
                 for (let inputNode in input.body) {
                     if (input.body.hasOwnProperty(inputNode))
                     {
@@ -189,6 +224,18 @@ class SuperchargeFactory
         }
 
 
+        if (node instanceof SuperchargeBindable)
+        {
+            console.log('yes');
+            node.initDataBinding();
+            for (let binding in input.bindings)
+            {
+                if (input.bindings.hasOwnProperty(binding))
+                {
+                    node.bind(binding, input.bindings[binding]);
+                }
+            }
+        }
         return node;
     }
 

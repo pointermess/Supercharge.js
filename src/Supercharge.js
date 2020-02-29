@@ -37,6 +37,19 @@ var Supercharge = (function () {
         this.element.onload = function () { return _this.onLoad(); };
         this.onCreate();
     }
+    Supercharge.prototype.setId = function (id) {
+        this.element.id = id;
+    };
+    Supercharge.prototype.setAttribute = function (attr, value) {
+    };
+    Supercharge.prototype.addClass = function (attr, value) {
+    };
+    Supercharge.prototype.removeClass = function (attr, value) {
+    };
+    Supercharge.prototype.hasClass = function (attr, value) {
+    };
+    Supercharge.prototype.toggleClass = function (attr, value) {
+    };
     Supercharge.prototype.mount = function (element) {
         this.onMount();
         if (element instanceof Node)
@@ -46,6 +59,14 @@ var Supercharge = (function () {
     };
     Supercharge.prototype.unmount = function () {
         this.element.parentNode.removeChild(this.element);
+    };
+    Supercharge.prototype.insert = function (array) {
+        for (var item in array) {
+            if (array.hasOwnProperty(item)) {
+                array[item].mount(this);
+                console.log(array[item]);
+            }
+        }
     };
     Supercharge.prototype.onClick = function (e) { };
     ;
@@ -60,14 +81,19 @@ var Supercharge = (function () {
 var SuperchargeBindable = (function (_super) {
     __extends(SuperchargeBindable, _super);
     function SuperchargeBindable(tag, body) {
+        if (body === void 0) { body = ''; }
         var _this = _super.call(this, tag, body) || this;
         _this.binding = false;
         _this.innerHtml = '';
         _this.bindings = {};
-        _this.innerHtml = _this.element.innerHTML;
+        _this.initDataBinding();
         _this.onCreate();
         return _this;
     }
+    SuperchargeBindable.prototype.initDataBinding = function () {
+        this.innerHtml = this.element.innerHTML;
+        console.log(this.innerHtml);
+    };
     SuperchargeBindable.prototype.bind = function (key, defaultValue) {
         if (defaultValue === void 0) { defaultValue = ''; }
         this.bindings[key] = {
@@ -79,6 +105,9 @@ var SuperchargeBindable = (function (_super) {
         var def = this.innerHtml;
         for (var binding in this.bindings) {
             var value = this.bindings[binding].val;
+            if (typeof value == "function") {
+                value = this.bindings[binding].val();
+            }
             def = def.replace('{' + binding + '}', value);
         }
         this.element.innerHTML = def;
@@ -104,20 +133,14 @@ var SuperchargeFactory = (function () {
             return input;
         }
         else {
+            if (typeof input.bindings != "undefined")
+                node = new SuperchargeBindable(input.tag);
+            else
+                node = new Supercharge(input.tag);
             if (typeof input.body == "string") {
-                if (typeof input.bindings != "undefined") {
-                    node = new SuperchargeBindable(input.tag, input.body);
-                    for (var binding in input.bindings) {
-                        if (input.bindings.hasOwnProperty(binding)) {
-                            node.bind(binding, input.bindings[binding]);
-                        }
-                    }
-                }
-                else
-                    node = new Supercharge(input.tag, input.body);
+                node.element.appendChild(document.createTextNode(input.body));
             }
             else if (typeof input.body == "object") {
-                node = new Supercharge(input.tag);
                 for (var inputNode in input.body) {
                     if (input.body.hasOwnProperty(inputNode)) {
                         var childNode = this.build(input.body[inputNode], node);
@@ -139,6 +162,15 @@ var SuperchargeFactory = (function () {
             if (input.functions.hasOwnProperty(inputFunction)) {
                 parentNode[inputFunction] = input.functions[inputFunction];
                 console.log('added to root: ' + inputFunction);
+            }
+        }
+        if (node instanceof SuperchargeBindable) {
+            console.log('yes');
+            node.initDataBinding();
+            for (var binding in input.bindings) {
+                if (input.bindings.hasOwnProperty(binding)) {
+                    node.bind(binding, input.bindings[binding]);
+                }
             }
         }
         return node;
