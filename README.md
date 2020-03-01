@@ -111,6 +111,43 @@ let factory = SuperchargeFactory.build({
 });
 ```
 
+### Viewer
+
+#### Setup up the viewer
+
+```js
+// setup viewer
+// the passed argument has to be a Supercharge object or a html node element
+let viewer = new SuperchargeViewer(this);
+```
+
+#### Setting the view
+
+```js
+viewer.setView(SuperchargeFactory.build({
+  tag: 'div',
+  body: 'This is a test view.',
+}));
+```
+
+#### Events and Transitions
+
+```js
+// setup events for view transitions
+this.viewer.onChangeView = function (continueFn) {
+    this.addClass('__DACWTransitionHide');
+    setTimeout(function () {
+        continueFn();
+    }.bind(this), 400);
+}.bind(this);
+
+this.viewer.onViewChanged = function () {
+    this.removeClass('__DACWTransitionHide');
+}.bind(this);
+```
+
+
+
 ### Credits
 
 This framework was heavily inspired by [Igniter](https://github.com/nicoth-in/igniter) from [Nicothin](https://github.com/nicoth-in).
