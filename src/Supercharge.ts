@@ -14,7 +14,6 @@ class Supercharge {
         // append body
         this.element = document.createElement(tag);
 
-
         if (typeof body == "string")
         {
             node = document.createTextNode(body);
@@ -36,6 +35,7 @@ class Supercharge {
             }
         }
 
+        // bind events
         this.element.onclick = (e) => this.onClick(e);
         this.element.onload = () => this.onLoad();
 
@@ -47,23 +47,39 @@ class Supercharge {
     }
 
     public setAttribute(attr, value) {
+        this.element.setAttribute(attr, value);
+    }
+
+    public getAttribute(attr) {
+        this.element.getAttribute(attr);
+    }
+
+    public addClass(className) {
+        if (!this.hasClass(className))
+            this.element.className += " " + className;
+    }
+
+    public removeClass(className) {
+        if (this.element.classList)
+            this.element.classList.remove(className);
+        else
+            this.element.className = this.element.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
 
     }
 
-    public addClass(attr, value) {
-
+    public hasClass(className) : boolean {
+        return !!this.element.className.match(new RegExp('(\\s|^)'+className+'(\\s|$)'));
     }
 
-    public removeClass(attr, value) {
-
+    public toggleClass(className) {
+        if (this.hasClass(className))
+            this.removeClass(className)
+        else
+            this.addClass(className)
     }
 
-    public hasClass(attr, value) {
-
-    }
-
-    public toggleClass(attr, value) {
-
+    public setStyle(property, value) {
+        this.element.style[property] = value;
     }
 
     public mount(element) {
@@ -85,7 +101,6 @@ class Supercharge {
             if (array.hasOwnProperty(item))
             {
                 array[item].mount(this);
-                console.log(array[item]);
             }
         }
     }
@@ -144,6 +159,19 @@ class SuperchargeFactory
         // experimental feature
         let parentNode = node;
         if (parent != undefined) parentNode = parent;
+
+        // id, classes and styles
+        if (typeof input.id == "string")
+            node.setId(input.id);
+
+        if (typeof input.classes == "object")
+        {
+            for (let className in input.classes)
+            {
+                if (input.classes.hasOwnProperty(className))
+                    node.addClass(input.classes[className]);
+            }
+        }
 
         if (typeof input.onClick == "function") node.onClick = input.onClick.bind(parentNode);
         if (typeof input.onMount == "function") node.onMount = input.onMount.bind(parentNode);

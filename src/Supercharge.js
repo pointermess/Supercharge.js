@@ -28,14 +28,32 @@ var Supercharge = (function () {
         this.element.id = id;
     };
     Supercharge.prototype.setAttribute = function (attr, value) {
+        this.element.setAttribute(attr, value);
     };
-    Supercharge.prototype.addClass = function (attr, value) {
+    Supercharge.prototype.getAttribute = function (attr) {
+        this.element.getAttribute(attr);
     };
-    Supercharge.prototype.removeClass = function (attr, value) {
+    Supercharge.prototype.addClass = function (className) {
+        if (!this.hasClass(className))
+            this.element.className += " " + className;
     };
-    Supercharge.prototype.hasClass = function (attr, value) {
+    Supercharge.prototype.removeClass = function (className) {
+        if (this.element.classList)
+            this.element.classList.remove(className);
+        else
+            this.element.className = this.element.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
     };
-    Supercharge.prototype.toggleClass = function (attr, value) {
+    Supercharge.prototype.hasClass = function (className) {
+        return !!this.element.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
+    };
+    Supercharge.prototype.toggleClass = function (className) {
+        if (this.hasClass(className))
+            this.removeClass(className);
+        else
+            this.addClass(className);
+    };
+    Supercharge.prototype.setStyle = function (property, value) {
+        this.element.style[property] = value;
     };
     Supercharge.prototype.mount = function (element) {
         this.onMount();
@@ -51,7 +69,6 @@ var Supercharge = (function () {
         for (var item in array) {
             if (array.hasOwnProperty(item)) {
                 array[item].mount(this);
-                console.log(array[item]);
             }
         }
     };
@@ -91,6 +108,14 @@ var SuperchargeFactory = (function () {
         var parentNode = node;
         if (parent != undefined)
             parentNode = parent;
+        if (typeof input.id == "string")
+            node.setId(input.id);
+        if (typeof input.classes == "object") {
+            for (var className in input.classes) {
+                if (input.classes.hasOwnProperty(className))
+                    node.addClass(input.classes[className]);
+            }
+        }
         if (typeof input.onClick == "function")
             node.onClick = input.onClick.bind(parentNode);
         if (typeof input.onMount == "function")
