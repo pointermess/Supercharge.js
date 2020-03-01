@@ -134,15 +134,15 @@ viewer.setView(SuperchargeFactory.build({
 
 ```js
 // setup events for view transitions
-this.viewer.onChangeView = function (continueFn) {
-    this.addClass('__DACWTransitionHide');
+viewer.onChangeView = function (continueFn) {
+    this.addClass('TransitionAnimation');
     setTimeout(function () {
         continueFn();
     }.bind(this), 400);
 }.bind(this);
 
-this.viewer.onViewChanged = function () {
-    this.removeClass('__DACWTransitionHide');
+viewer.onViewChanged = function () {
+    this.removeClass('TransitionAnimation');
 }.bind(this);
 ```
 
