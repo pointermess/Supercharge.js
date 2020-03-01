@@ -82,12 +82,40 @@ var Supercharge = (function () {
     ;
     return Supercharge;
 }());
+var SuperchargeViewer = (function () {
+    function SuperchargeViewer(parent) {
+        this.currentView = undefined;
+        this.parent = parent;
+    }
+    SuperchargeViewer.prototype.setView = function (view) {
+        var _this = this;
+        this.onChangeView(function () {
+            if (_this.currentView != undefined)
+                _this.currentView.unmount();
+            _this.currentView = view;
+            view.mount(_this.parent);
+            _this.onViewChanged();
+        });
+    };
+    SuperchargeViewer.prototype.removeView = function () {
+        if (this.currentView != undefined) {
+            this.currentView.unmount();
+            this.currentView = undefined;
+        }
+    };
+    SuperchargeViewer.prototype.onChangeView = function (continueFn) { continueFn(); };
+    SuperchargeViewer.prototype.onViewChanged = function () { };
+    return SuperchargeViewer;
+}());
 var SuperchargeFactory = (function () {
     function SuperchargeFactory() {
     }
     SuperchargeFactory.build = function (input, parent) {
         if (parent === void 0) { parent = undefined; }
         var node;
+        var parentNode = node;
+        if (parent != undefined)
+            parentNode = parent;
         if (input instanceof Supercharge) {
             return input;
         }
@@ -99,15 +127,12 @@ var SuperchargeFactory = (function () {
             else if (typeof input.body == "object") {
                 for (var inputNode in input.body) {
                     if (input.body.hasOwnProperty(inputNode)) {
-                        var childNode = this.build(input.body[inputNode], node);
+                        var childNode = this.build(input.body[inputNode], parentNode);
                         node.element.appendChild(childNode.element);
                     }
                 }
             }
         }
-        var parentNode = node;
-        if (parent != undefined)
-            parentNode = parent;
         if (typeof input.id == "string")
             node.setId(input.id);
         if (typeof input.classes == "object") {
@@ -130,10 +155,11 @@ var SuperchargeFactory = (function () {
         }
         return node;
     };
-    SuperchargeFactory.buildArray = function (input) {
+    SuperchargeFactory.buildArray = function (input, parentNode) {
+        if (parentNode === void 0) { parentNode = undefined; }
         var result = [];
         for (var inputNode in input) {
-            result.push(this.build(input[inputNode]));
+            result.push(this.build(input[inputNode], parentNode));
         }
         return result;
     };

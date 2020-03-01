@@ -4,6 +4,8 @@
  * Can be used as base to derive classes from or can be used to directly
  * work on Supercharge instances
  */
+
+
 class Supercharge {
     public element;
 
@@ -115,6 +117,37 @@ class Supercharge {
     public onCreate() {};
 }
 
+class SuperchargeViewer {
+    private parent;
+    private currentView = undefined;
+
+    constructor(parent) {
+        this.parent = parent;
+    }
+
+    public setView(view) {
+        this.onChangeView(() => {
+            if (this.currentView != undefined)
+                this.currentView.unmount();
+
+            this.currentView = view;
+            view.mount(this.parent);
+            this.onViewChanged();
+        })
+    }
+
+    public removeView() {
+        if (this.currentView != undefined)
+        {
+            this.currentView.unmount();
+            this.currentView = undefined;
+        }
+    }
+
+    public onChangeView(continueFn) { continueFn() }
+
+    public onViewChanged() {}
+}
 
 /**
  * factory class to build trees of Supercharge objects
@@ -130,6 +163,10 @@ class SuperchargeFactory
     {
         let node;
 
+
+        // experimental feature
+        let parentNode = node;
+        if (parent != undefined) parentNode = parent;
 
         if (input instanceof Supercharge)
         {
@@ -149,16 +186,13 @@ class SuperchargeFactory
                 for (let inputNode in input.body) {
                     if (input.body.hasOwnProperty(inputNode))
                     {
-                        let childNode = this.build(input.body[inputNode], node);
+                        let childNode = this.build(input.body[inputNode], parentNode);
                         node.element.appendChild(childNode.element);
                     }
                 }
             }
         }
 
-        // experimental feature
-        let parentNode = node;
-        if (parent != undefined) parentNode = parent;
 
         // id, classes and styles
         if (typeof input.id == "string")
@@ -190,13 +224,13 @@ class SuperchargeFactory
     }
 
 
-    public static buildArray(input) : any
+    public static buildArray(input, parentNode = undefined) : any
     {
         let result = [];
 
 
         for (let inputNode in input) {
-            result.push(this.build(input[inputNode]));
+            result.push(this.build(input[inputNode], parentNode));
         }
 
         return result;
