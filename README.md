@@ -14,7 +14,7 @@
 ### Basic usage
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/pointermess/Supercharge.js@v0.2/src/Supercharge.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/pointermess/Supercharge.js@v0.2.2/src/Supercharge.js"></script>
 ```
 
 ```js
