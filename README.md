@@ -1,11 +1,11 @@
 # Supercharge.js
 
-Supercharge.js is a lightweight, low-abstraction JavaScript frontend framework in testing stage. It simplifies managing the DOM in an object-oriented fashion.
+Supercharge.js is a lightweight, low-abstraction JavaScript frontend framework. It simplifies managing the DOM in an object-oriented fashion.
 
 ### Basic usage
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/pointermess/Supercharge.js@v0.1/src/Supercharge.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/pointermess/Supercharge.js@v0.2/src/Supercharge.js"></script>
 ```
 
 ```js
