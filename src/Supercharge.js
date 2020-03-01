@@ -90,10 +90,21 @@ var SuperchargeViewer = (function () {
     SuperchargeViewer.prototype.setView = function (view) {
         var _this = this;
         this.onChangeView(function () {
-            if (_this.currentView != undefined)
-                _this.currentView.unmount();
+            if (_this.currentView != undefined) {
+                if (_this.currentView instanceof Supercharge)
+                    _this.currentView.unmount();
+                else {
+                    for (var index in _this.currentView) {
+                        if (_this.currentView.hasOwnProperty(index))
+                            _this.currentView[index].unmount();
+                    }
+                }
+            }
             _this.currentView = view;
-            view.mount(_this.parent);
+            if (_this.currentView instanceof Supercharge)
+                view.mount(_this.parent);
+            else
+                _this.parent.insert(view);
             _this.onViewChanged();
         });
     };
@@ -139,6 +150,12 @@ var SuperchargeFactory = (function () {
             for (var className in input.classes) {
                 if (input.classes.hasOwnProperty(className))
                     node.addClass(input.classes[className]);
+            }
+        }
+        if (typeof input.attributes == "object") {
+            for (var attributeName in input.attributes) {
+                if (input.attributes.hasOwnProperty(attributeName))
+                    node.setAttribute(attributeName, input.attributes[attributeName]);
             }
         }
         if (typeof input.onClick == "function")

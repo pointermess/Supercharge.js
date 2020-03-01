@@ -128,10 +128,26 @@ class SuperchargeViewer {
     public setView(view) {
         this.onChangeView(() => {
             if (this.currentView != undefined)
-                this.currentView.unmount();
+            {
+                if (this.currentView instanceof Supercharge)
+                    this.currentView.unmount();
+                else
+                {
+                    for (let index in this.currentView)
+                    {
+                        if (this.currentView.hasOwnProperty(index))
+                            this.currentView[index].unmount();
+                    }
+                }
+            }
 
             this.currentView = view;
-            view.mount(this.parent);
+
+            if (this.currentView instanceof Supercharge)
+                view.mount(this.parent);
+            else
+                this.parent.insert(view);
+
             this.onViewChanged();
         })
     }
@@ -204,6 +220,15 @@ class SuperchargeFactory
             {
                 if (input.classes.hasOwnProperty(className))
                     node.addClass(input.classes[className]);
+            }
+        }
+
+        if (typeof input.attributes == "object")
+        {
+            for (let attributeName in input.attributes)
+            {
+                if (input.attributes.hasOwnProperty(attributeName))
+                    node.setAttribute(attributeName, input.attributes[attributeName]);
             }
         }
 
