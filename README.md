@@ -1,6 +1,6 @@
 
 <h1 align="center">
-    Supercharge.js v0.2
+    Supercharge.js v0.2.1
 </h1>
 
 <p align="center">
