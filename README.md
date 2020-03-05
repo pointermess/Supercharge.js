@@ -7,15 +7,12 @@
     <img src="https://github.com/pointermess/Supercharge.js/blob/dev/media/repo_logo.png">
 </p>
 
-<span align="center">
-    Supercharge.js is a lightweight, low-abstraction JavaScript frontend framework. It simplifies managing the DOM in an object-oriented fashion.
-</span>
+Supercharge.js is a lightweight, low-abstraction JavaScript frontend framework. It simplifies managing the DOM in an object-oriented fashion.
 
 <hr>
 
-<span align="center">
-    <strong>Warning:</strong> This branch is a development branch.<strong>DO NOT</strong> use this in any production environment.
-</span>
+**Warning:** This branch is a development branch. **DO NOT** use this in any production environment.
+
 
 <hr>
 
