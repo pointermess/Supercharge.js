@@ -1,11 +1,28 @@
-# Supercharge.js
 
-Supercharge.js is a lightweight, low-abstraction JavaScript frontend framework in testing stage. It simplifies managing the DOM in an object-oriented fashion.
+<h1 align="center">
+    Supercharge.js v0.3 Development Branch
+</h1>
+
+<p align="center">
+    <img src="https://github.com/pointermess/Supercharge.js/blob/dev/media/repo_logo.png">
+</p>
+
+<span align="center">
+    Supercharge.js is a lightweight, low-abstraction JavaScript frontend framework. It simplifies managing the DOM in an object-oriented fashion.
+</span>
+
+<hr>
+
+<span align="center">
+    <strong>Warning:</strong> This branch is a development branch.<strong>DO NOT</strong> use this in any production environment.
+</span>
+
+<hr>
 
 ### Basic usage
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/pointermess/Supercharge.js@v0.1/src/Supercharge.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/pointermess/Supercharge.js@v0.3-dev/src/Supercharge.js"></script>
 ```
 
 ```js
@@ -101,6 +118,43 @@ let factory = SuperchargeFactory.build({
     }
 });
 ```
+
+### Viewer
+
+#### Setup up the viewer
+
+```js
+// setup viewer
+// the passed argument has to be a Supercharge object or a html node element
+let viewer = new SuperchargeViewer(this);
+```
+
+#### Setting the view
+
+```js
+viewer.setView(SuperchargeFactory.build({
+  tag: 'div',
+  body: 'This is a test view.',
+}));
+```
+
+#### Events and Transitions
+
+```js
+// setup events for view transitions
+viewer.onChangeView = function (continueFn) {
+    this.addClass('TransitionAnimation');
+    setTimeout(function () {
+        continueFn();
+    }.bind(this), 400);
+}.bind(this);
+
+viewer.onViewChanged = function () {
+    this.removeClass('TransitionAnimation');
+}.bind(this);
+```
+
+
 
 ### Credits
 
