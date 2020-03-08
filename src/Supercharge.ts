@@ -6,7 +6,41 @@
 class Supercharge {
     public element : HTMLElement;
 
+    public data : Object = {
+        test: 'test'
+    };
+
+    private bindings : SuperchargeDataBindings;
+
+    protected setupBindings() {
+
+        let test = this.element.querySelectorAll('[sc-bind-text]');
+
+        let bindings = {
+            text: [
+            ],
+            html: [],
+            classes: [],
+        };
+
+        for (let key in test)
+        {
+            if (test.hasOwnProperty(key))
+            {
+                bindings.text.push({
+                    element: test[key],
+                    key: test[key].getAttribute('sc-bind-text')
+                });
+            }
+        }
+
+        console.log(bindings);
+
+        this.bindings = new SuperchargeDataBindings(this.data, bindings);
+    }
+
     constructor(tag: string, body: any = undefined) {
+
         // create element
         let node;
 
@@ -38,6 +72,10 @@ class Supercharge {
         this.element.onmousemove = (e) => this.onMouseMove(e);
 
         this.onCreate();
+
+
+
+        this.setupBindings();
     }
 
     /*
@@ -137,6 +175,7 @@ class SuperchargeViewer {
 
     public setView(view: Supercharge|Array<Supercharge>) : void {
         this.onChangeView(() => {
+            // unmount current view
             if (this.currentView != undefined) {
                 if (this.currentView instanceof Supercharge)
                     this.currentView.unmount();
@@ -148,8 +187,8 @@ class SuperchargeViewer {
                 }
             }
 
+            // set new view
             this.currentView = view;
-
             if (view instanceof Supercharge)
                 view.mount(this.parent);
             else
@@ -169,6 +208,88 @@ class SuperchargeViewer {
     // Events
     public onChangeView(continueFn) { continueFn() }
     public onViewChanged() {}
+}
+
+
+class SuperchargeBindingContext {
+    private bindings;
+    private data;
+    private value;
+    public property;
+
+    public getValue() {
+        return this.value;
+    }
+
+    public setValue(value) {
+        this.value = value;
+    }
+
+
+    constructor(data, bindings) {
+        this.data = data;
+        this.bindings = bindings;
+    }
+}
+
+class SuperchargeDataBindings {
+
+
+    private proxy;
+    public bindings = {
+        text: [
+        ],
+        html: [],
+        classes: [],
+    };
+
+    public data : Object;
+
+    constructor(data : Object, bindings) {
+        // set reference
+        this.data = data;
+        console.log('----- start init ----');
+        this.bindings = bindings;
+        console.log(this.bindings);
+        console.log('----- end init ----');
+
+        this.initObserver();
+    }
+
+    private initObserver() {
+
+        for (let key in this.data) {
+            if (this.data.hasOwnProperty(key))
+            {
+                let obj = new SuperchargeBindingContext(this.data, this.bindings);
+                obj.property = key;
+                Object.defineProperty(this.data, this.data[key], {
+                    configurable: true,
+                    get: this.valueGetter.bind(obj),
+                    set: this.valueSetter.bind(obj)
+                });
+            }
+        }
+
+    }
+
+    private valueGetter() {
+        // @ts-ignore
+        return this.getValue();
+    }
+
+    private valueSetter(val) {
+        // @ts-ignore
+        this.setValue(val);
+        console.log(this.bindings);
+
+        for (let key in this.bindings.text) {
+            if (this.bindings.text.hasOwnProperty(key)) {
+                let context = this.bindings.text[key];
+                context.element.textContent = this.getValue();
+            }
+        }
+    }
 }
 
 /**
@@ -254,7 +375,7 @@ class SuperchargeFactory
     }
 
 
-    public static buildArray(input : Array<any>, parentNode : string = undefined) : Supercharge[] {
+    public static buildArray(input : Array<any>, parentNode : Supercharge = undefined) : Supercharge[] {
         let result : Supercharge[] = [];
 
         for (let inputNode in input) {

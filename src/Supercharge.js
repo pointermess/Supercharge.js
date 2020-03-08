@@ -7,6 +7,9 @@ var Supercharge = /** @class */ (function () {
     function Supercharge(tag, body) {
         var _this = this;
         if (body === void 0) { body = undefined; }
+        this.data = {
+            test: 'test'
+        };
         // create element
         var node;
         // append body
@@ -34,7 +37,26 @@ var Supercharge = /** @class */ (function () {
         this.element.onload = function () { return _this.onLoad(); };
         this.element.onmousemove = function (e) { return _this.onMouseMove(e); };
         this.onCreate();
+        this.setupBindings();
     }
+    Supercharge.prototype.setupBindings = function () {
+        var test = this.element.querySelectorAll('[sc-bind-text]');
+        var bindings = {
+            text: [],
+            html: [],
+            classes: [],
+        };
+        for (var key in test) {
+            if (test.hasOwnProperty(key)) {
+                bindings.text.push({
+                    element: test[key],
+                    key: test[key].getAttribute('sc-bind-text')
+                });
+            }
+        }
+        console.log(bindings);
+        this.bindings = new SuperchargeDataBindings(this.data, bindings);
+    };
     /*
      * Events
      */
@@ -121,6 +143,7 @@ var SuperchargeViewer = /** @class */ (function () {
     SuperchargeViewer.prototype.setView = function (view) {
         var _this = this;
         this.onChangeView(function () {
+            // unmount current view
             if (_this.currentView != undefined) {
                 if (_this.currentView instanceof Supercharge)
                     _this.currentView.unmount();
@@ -131,6 +154,7 @@ var SuperchargeViewer = /** @class */ (function () {
                     }
                 }
             }
+            // set new view
             _this.currentView = view;
             if (view instanceof Supercharge)
                 view.mount(_this.parent);
@@ -149,6 +173,64 @@ var SuperchargeViewer = /** @class */ (function () {
     SuperchargeViewer.prototype.onChangeView = function (continueFn) { continueFn(); };
     SuperchargeViewer.prototype.onViewChanged = function () { };
     return SuperchargeViewer;
+}());
+var SuperchargeBindingContext = /** @class */ (function () {
+    function SuperchargeBindingContext(data, bindings) {
+        this.data = data;
+        this.bindings = bindings;
+    }
+    SuperchargeBindingContext.prototype.getValue = function () {
+        return this.value;
+    };
+    SuperchargeBindingContext.prototype.setValue = function (value) {
+        this.value = value;
+    };
+    return SuperchargeBindingContext;
+}());
+var SuperchargeDataBindings = /** @class */ (function () {
+    function SuperchargeDataBindings(data, bindings) {
+        this.bindings = {
+            text: [],
+            html: [],
+            classes: [],
+        };
+        // set reference
+        this.data = data;
+        console.log('----- start init ----');
+        this.bindings = bindings;
+        console.log(this.bindings);
+        console.log('----- end init ----');
+        this.initObserver();
+    }
+    SuperchargeDataBindings.prototype.initObserver = function () {
+        for (var key in this.data) {
+            if (this.data.hasOwnProperty(key)) {
+                var obj = new SuperchargeBindingContext(this.data, this.bindings);
+                obj.property = key;
+                Object.defineProperty(this.data, this.data[key], {
+                    configurable: true,
+                    get: this.valueGetter.bind(obj),
+                    set: this.valueSetter.bind(obj)
+                });
+            }
+        }
+    };
+    SuperchargeDataBindings.prototype.valueGetter = function () {
+        // @ts-ignore
+        return this.getValue();
+    };
+    SuperchargeDataBindings.prototype.valueSetter = function (val) {
+        // @ts-ignore
+        this.setValue(val);
+        console.log(this.bindings);
+        for (var key in this.bindings.text) {
+            if (this.bindings.text.hasOwnProperty(key)) {
+                var context = this.bindings.text[key];
+                context.element.textContent = this.getValue();
+            }
+        }
+    };
+    return SuperchargeDataBindings;
 }());
 /**
  * factory class to build trees of Supercharge objects
