@@ -7,6 +7,7 @@ class Supercharge {
     public element : HTMLElement;
 
     constructor(tag: string, body: any = undefined) {
+
         // create element
         let node;
 
@@ -120,6 +121,10 @@ class Supercharge {
             }
         }
     }
+
+    public find(query) {
+        return this.element.querySelector(query);
+    }
 }
 
 /**
@@ -137,6 +142,7 @@ class SuperchargeViewer {
 
     public setView(view: Supercharge|Array<Supercharge>) : void {
         this.onChangeView(() => {
+            // unmount current view
             if (this.currentView != undefined) {
                 if (this.currentView instanceof Supercharge)
                     this.currentView.unmount();
@@ -148,15 +154,19 @@ class SuperchargeViewer {
                 }
             }
 
+            // set new view
             this.currentView = view;
-
             if (view instanceof Supercharge)
                 view.mount(this.parent);
             else
                 this.parent.insert(view);
 
             this.onViewChanged();
-        })
+        });
+    }
+
+    public getView() {
+        return this.currentView;
     }
 
     public removeView() : void {
@@ -170,6 +180,7 @@ class SuperchargeViewer {
     public onChangeView(continueFn) { continueFn() }
     public onViewChanged() {}
 }
+
 
 /**
  * factory class to build trees of Supercharge objects
@@ -202,11 +213,19 @@ class SuperchargeFactory
                 node.element.appendChild(document.createTextNode(input.body));
             }
             else if (typeof input.body == "object") {
-                for (let inputNode in input.body) {
-                    if (input.body.hasOwnProperty(inputNode)) {
-                        let childNode = this.build(input.body[inputNode], parentNode);
-                        node.element.appendChild(childNode.element);
+                if (Array.isArray(input.body))
+                {
+                    for (let inputNode in input.body) {
+                        if (input.body.hasOwnProperty(inputNode)) {
+                            let childNode = this.build(input.body[inputNode], parentNode);
+                            node.element.appendChild(childNode.element);
+                        }
                     }
+                }
+                else
+                {
+                    let childNode = this.build(input.body, parentNode);
+                    node.element.appendChild(childNode.element);
                 }
             }
         }
@@ -215,6 +234,13 @@ class SuperchargeFactory
         // id, classes and styles
         if (typeof input.id == "string")
             node.setId(input.id);
+
+        if (typeof input.styles == "object") {
+            for (let styleName in input.styles) {
+                if (input.styles.hasOwnProperty(styleName))
+                    node.setStyle(styleName, input.styles[styleName]);
+            }
+        }
 
         if (typeof input.classes == "object") {
             for (let className in input.classes) {
@@ -254,7 +280,7 @@ class SuperchargeFactory
     }
 
 
-    public static buildArray(input : Array<any>, parentNode : string = undefined) : Supercharge[] {
+    public static buildArray(input : Array<any>, parentNode : Supercharge = undefined) : Supercharge[] {
         let result : Supercharge[] = [];
 
         for (let inputNode in input) {
