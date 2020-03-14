@@ -1,15 +1,8 @@
-/**
- * Supercharge Class
- *
- * Basic Supercharge element.
- */
-var Supercharge = /** @class */ (function () {
+var Supercharge = (function () {
     function Supercharge(tag, body) {
         var _this = this;
         if (body === void 0) { body = undefined; }
-        // create element
         var node;
-        // append body
         this.element = document.createElement(tag);
         if (typeof body == "string") {
             node = document.createTextNode(body);
@@ -29,15 +22,11 @@ var Supercharge = /** @class */ (function () {
             else
                 console.error('Unknown body type');
         }
-        // bind events
         this.element.onclick = function (e) { return _this.onClick(e); };
         this.element.onload = function () { return _this.onLoad(); };
         this.element.onmousemove = function (e) { return _this.onMouseMove(e); };
         this.onCreate();
     }
-    /*
-     * Events
-     */
     Supercharge.prototype.onClick = function (e) { };
     ;
     Supercharge.prototype.onMouseMove = function (e) { };
@@ -106,14 +95,12 @@ var Supercharge = /** @class */ (function () {
             }
         }
     };
+    Supercharge.prototype.find = function (query) {
+        return this.element.querySelector(query);
+    };
     return Supercharge;
 }());
-/**
- * SuperchargeViewer Class
- *
- * Container class to set
- */
-var SuperchargeViewer = /** @class */ (function () {
+var SuperchargeViewer = (function () {
     function SuperchargeViewer(parent) {
         this.currentView = undefined;
         this.parent = parent;
@@ -139,32 +126,25 @@ var SuperchargeViewer = /** @class */ (function () {
             _this.onViewChanged();
         });
     };
+    SuperchargeViewer.prototype.getView = function () {
+        return this.currentView;
+    };
     SuperchargeViewer.prototype.removeView = function () {
         if (this.currentView instanceof Supercharge) {
             this.currentView.unmount();
             this.currentView = undefined;
         }
     };
-    // Events
     SuperchargeViewer.prototype.onChangeView = function (continueFn) { continueFn(); };
     SuperchargeViewer.prototype.onViewChanged = function () { };
     return SuperchargeViewer;
 }());
-/**
- * factory class to build trees of Supercharge objects
- */
-var SuperchargeFactory = /** @class */ (function () {
+var SuperchargeFactory = (function () {
     function SuperchargeFactory() {
     }
-    /**
-     * Builds a tree of Supercharge objects
-     * @param input object
-     * @return Built instance of a Supercharge object
-     */
     SuperchargeFactory.build = function (input, parent) {
         if (parent === void 0) { parent = undefined; }
         var node;
-        // experimental feature
         var parentNode = node;
         if (parent != undefined)
             parentNode = parent;
@@ -173,22 +153,32 @@ var SuperchargeFactory = /** @class */ (function () {
         }
         else {
             node = new Supercharge(input.tag);
-            // TODO: finish build process
             if (typeof input.body == "string") {
                 node.element.appendChild(document.createTextNode(input.body));
             }
             else if (typeof input.body == "object") {
-                for (var inputNode in input.body) {
-                    if (input.body.hasOwnProperty(inputNode)) {
-                        var childNode = this.build(input.body[inputNode], parentNode);
-                        node.element.appendChild(childNode.element);
+                if (Array.isArray(input.body)) {
+                    for (var inputNode in input.body) {
+                        if (input.body.hasOwnProperty(inputNode)) {
+                            var childNode = this.build(input.body[inputNode], parentNode);
+                            node.element.appendChild(childNode.element);
+                        }
                     }
+                }
+                else {
+                    var childNode = this.build(input.body, parentNode);
+                    node.element.appendChild(childNode.element);
                 }
             }
         }
-        // id, classes and styles
         if (typeof input.id == "string")
             node.setId(input.id);
+        if (typeof input.styles == "object") {
+            for (var styleName in input.styles) {
+                if (input.styles.hasOwnProperty(styleName))
+                    node.setStyle(styleName, input.styles[styleName]);
+            }
+        }
         if (typeof input.classes == "object") {
             for (var className in input.classes) {
                 if (input.classes.hasOwnProperty(className))
@@ -207,15 +197,12 @@ var SuperchargeFactory = /** @class */ (function () {
             node.onMount = input.onMount.bind(parentNode);
         if (typeof input.onCreate == "function")
             node.onMount = input.onCreate.bind(node);
-        // functions
         for (var inputFunction in input.functions) {
             if (input.functions.hasOwnProperty(inputFunction)) {
                 parentNode[inputFunction] = input.functions[inputFunction];
                 console.log('added to root: ' + inputFunction);
             }
         }
-        // owned functions
-        // bound to the created node instead of the parent node
         for (var inputFunction in input.owned) {
             if (input.owned.hasOwnProperty(inputFunction)) {
                 parentNode[inputFunction] = input.owned[inputFunction].bind(node);
@@ -233,4 +220,4 @@ var SuperchargeFactory = /** @class */ (function () {
     };
     return SuperchargeFactory;
 }());
-//# sourceMappingURL=Supercharge.js.map
+//# sourceMappingURL=supercharge.js.map
