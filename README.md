@@ -1,6 +1,6 @@
 
 <h1 align="center">
-    Supercharge.js v0.3 Development Branch
+    Supercharge.js v0.3
 </h1>
 
 <p align="center">
@@ -9,12 +9,6 @@
 
 Supercharge.js is a lightweight, low-abstraction JavaScript frontend framework. It simplifies creating DOM structures and helps managing them in an object-oriented fashion.
 
-<hr>
-
-**Warning:** This branch is a development branch. **DO NOT** use this in any production environment.
-
-
-<hr>
 
 ### Basic usage
 
