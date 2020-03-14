@@ -13,7 +13,7 @@ Supercharge.js is a lightweight, low-abstraction JavaScript frontend framework. 
 ### Basic usage
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/pointermess/Supercharge.js@v0.3-dev/src/Supercharge.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/pointermess/Supercharge.js@v0.3/src/Supercharge.js"></script>
 ```
 
 ```js
